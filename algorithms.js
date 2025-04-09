@@ -94,15 +94,15 @@ const person_is_a_mango_seller = (name) => {
     return name[name.length - 1] === 'm'
 }
 
-const graph = new Map()
-graph.set("you",["alice","bob","claire"]);
-graph.set("bob",["anuj","peggy"]);
-graph.set("alice",["peggy"]);
-graph.set("claire",["thom","jonny"]);
-graph.set("anuj",[]);
-graph.set("peggy",[]);
-graph.set("thom",[]);
-graph.set("jonny",[]);
+const network = new Map()
+network.set("you",["alice","bob","claire"]);
+network.set("bob",["anuj","peggy"]);
+network.set("alice",["peggy"]);
+network.set("claire",["thom","jonny"]);
+network.set("anuj",[]);
+network.set("peggy",[]);
+network.set("thom",[]);
+network.set("jonny",[]);
 
 
 
@@ -113,7 +113,7 @@ graph.set("jonny",[]);
 // The functon uses Queues to search the whole network of friends for the shortest path to a Mango Seller
 function searchMangoSeller(){let search_queue = new Queue()
 
-graph.get("you").forEach(person => search_queue.enqueue(person));
+network.get("you").forEach(person => search_queue.enqueue(person));
 
 while (search_queue) {
     const person = search_queue.dequeue();
@@ -137,12 +137,70 @@ return false;
 
 
 
-const graph2 = new Map()
-const start = new Map()
+// Graph representation using Maps
+const graph = new Map([
+    ["start", new Map([["a", 6], ["b", 2]])],
+    ["a", new Map([["fin", 1]])],
+    ["b", new Map([["a", 3], ["fin", 5]])],
+    ["fin", new Map()]
+]);
 
-start.set("a",6)
-start.set("b",2)
+// Costs table
+const costs = new Map([
+    ["a", 6],
+    ["b", 2],
+    ["fin", Infinity]
+]);
 
-graph2.set("start", start)
+// Parents table
+const parents = new Map([
+    ["a", "start"],
+    ["b", "start"],
+    ["fin", null]
+]);
 
-console.log(graph2.get("start").keys())
+// Processed nodes to avoid re-processing
+const processed = new Set();
+
+function findLowestCostNode(costs) {
+    let lowestCost = Infinity;
+    let lowestCostNode = null;
+
+    for (const [node, cost] of costs) {
+        if (cost < lowestCost && !processed.has(node)) {
+            lowestCost = cost;
+            lowestCostNode = node;
+        }
+    }
+
+    return lowestCostNode;
+}
+
+// Dijkstra's Algorithm Implementation
+function dijkstra() {
+    let node = findLowestCostNode(costs);
+
+    while (node !== null) {
+        const cost = costs.get(node);
+        const neighbors = graph.get(node);
+
+        for (const [neighbor, weight] of neighbors) {
+            const newCost = cost + weight;
+
+            if (newCost < (costs.get(neighbor) || Infinity)) {
+                costs.set(neighbor, newCost);
+                parents.set(neighbor, node);
+            }
+        }
+
+        processed.add(node);
+        node = findLowestCostNode(costs);
+    }
+}
+
+// Run the algorithm
+dijkstra();
+
+// Display Results
+console.log("Costs Table:", Object.fromEntries(costs));
+console.log("Parents Table:", Object.fromEntries(parents));
