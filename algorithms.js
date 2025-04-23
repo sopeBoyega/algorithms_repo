@@ -48,7 +48,7 @@ return total;
 // console.log(sum([2,4,6]));
 
 // A recursive function is a function that calls itself 
-// For a recursive function this is a base case then a recursive case 
+// For a recursive function there is a base case then a recursive case 
 // Below is an example of recursive function to count the number of items in list 
 const countItems = (arr) => {
     if (arr.length === 0) {
